@@ -11,41 +11,50 @@ const { OPENAI_API_KEY } = process.env;
 // 获取命令行参数
 const [, , flowId] = process.argv;
 if (!flowId) {
-    console.log('请传入参数: node index.js <flow-xxxx>');
+    console.log('请传入参数: node npmpkg.js <flow-xxxx>');
     process.exit(1);
 }
 
-// 当前工作目录
-const workspaceDir = process.cwd();
-
-if (!fs.existsSync(workspaceDir)) {
-    console.log(`当前目录 ${workspaceDir} 不存在`);
+// 检查是否为 git 仓库
+const currentDir = process.cwd();
+if (!fs.existsSync(path.join(currentDir, '.git'))) {
+    console.log('当前目录不是 git 仓库，请在 git 项目目录下运行。');
     process.exit(1);
 }
 
-try {
-    // 获取 git diff 变更
-    const gitDiff = execSync('git diff', { cwd: projectPath, encoding: 'utf-8' });
-    if (gitDiff.trim() === '') {
-        console.log('当前分支没有未提交的变更。');
-    } else {
-        // console.log('当前分支的变更如下：\n');
-        // console.log(gitDiff);
+// 主函数
+async function main() {
+    try {
+        // 获取 git diff 变更
+        const gitDiff = execSync('git diff', { encoding: 'utf-8' });
+
+        if (gitDiff.trim() === '') {
+            console.log('当前分支没有未提交的变更。');
+            process.exit(0);
+        }
+
+        // 构建提示信息
         const message = `
-            根据以下 git diff 变更，生成一个 git commit 信息，需要包含：\n
-            1. 变更修改的内容\n
-            2. 变更修改的原因\n
-            按照以下示例格式返回：
-            fix(Flow-23456): 修复购物车数量更新时的状态同步问题
+根据以下 git diff 变更，生成一个 git commit 信息，只需要返回文字和换行符，不需要返回其他的字符，需要包含：
+1. 变更修改的内容
+2. 变更修改的原因
 
-                - 解决了购物车组件在数量变更时状态不同步的问题
-                - 优化了购物车数据更新的时序处理逻辑\n
-                - 修复了并发更新导致的数据不一致问题\n
-                - 确保购物车状态在各个组件间的正确同步\n
-            ${gitDiff}
-        `;
+按照以下格式返回（使用实际的 flowId: ${flowId}）：
+fix(${flowId}): 修复购物车数量更新时的状态同步问题
 
-        // TODO：接入 mcp 服务，针对 git diff 的变更，进行代码分析，并给出分析结果
+    - 解决了购物车组件在数量变更时状态不同步的问题
+    - 优化了购物车数据更新的时序处理逻辑
+    - 修复了并发更新导致的数据不一致问题
+    - 确保购物车状态在各个组件间的正确同步
+
+${gitDiff}`;
+
+        if (!OPENAI_API_KEY) {
+            console.log('请设置 OPENAI_API_KEY 环境变量');
+            process.exit(1);
+        }
+
+        // 调用 API 生成 commit message
         const response = await fetch('https://api.chatanywhere.tech/v1/chat/completions', {
             method: 'POST',
             headers: {
@@ -58,26 +67,45 @@ try {
                 temperature: 0.7
             })
         });
-        
+
         const data = await response.json();
-        // console.log(JSON.stringify(data, null, 2));
+
+        if (!data.choices || !data.choices[0]) {
+            console.log('API 响应格式错误:', data);
+            process.exit(1);
+        }
+
         const commitMessage = data.choices[0].message.content;
+        console.log('\n生成的 commit message:\n');
         console.log(commitMessage);
 
         // 复制到剪贴板
-        execSync('echo "' + commitMessage + '" | pbcopy');
+        try {
+            // 使用临时文件来处理特殊字符
+            const tempFile = path.join(process.cwd(), '.temp_commit_msg');
+            fs.writeFileSync(tempFile, commitMessage, 'utf8');
+            execSync(`cat "${tempFile}" | pbcopy`);
+            fs.unlinkSync(tempFile); // 删除临时文件
+            console.log('\n✅ 已复制到剪贴板！');
+        } catch (copyError) {
+            console.log('\n❌ 复制到剪贴板失败:', copyError.message);
+        }
 
-        // 1 curl https://api.chatanywhere.tech/v1/chat/completions \
-        // 2   -H 'Content-Type: application/json' \
-        // 3   -H 'Authorization: Bearer YOUR_API_KEY' \
-        // 4   -d '{
-        // 5   "model": "gpt-3.5-turbo",
-        // 6   "messages": [{"role": "user", "content": "Say this is a test!"}],
-        // 7   "temperature": 0.7
-        // 8 }'
+    } catch (err) {
+        if (err.message.includes('git')) {
+            console.log('获取 git diff 失败，请确认该目录为 git 仓库。');
+        } else if (err.message.includes('fetch')) {
+            console.log('API 调用失败:', err.message);
+        } else {
+            console.log('发生错误:', err.message);
+        }
+        process.exit(1);
     }
-} catch (err) {
-    console.log('获取 git diff 失败，请确认该目录为 git 仓库。');
-    process.exit(1);
 }
+
+// 运行主函数
+main().catch(err => {
+    console.error('程序执行失败:', err);
+    process.exit(1);
+});
 
