@@ -8,10 +8,11 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "npmpkg": "./npmpkg.js"
+    "gcmsg": "./npmpkg.js"
   },
   "files": [
-    "npmpkg.js"
+    "npmpkg.js",
+    "index.js"
   ],
   "engines": {
     "node": ">=18.0.0"
