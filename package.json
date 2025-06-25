@@ -1,5 +1,5 @@
 {
-  "name": "commit-message-generator",
+  "name": "generator-commit-message",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",

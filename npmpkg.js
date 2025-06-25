@@ -3,6 +3,7 @@ import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
+import os from 'os';
 
 dotenv.config();
 
@@ -11,7 +12,7 @@ const { OPENAI_API_KEY } = process.env;
 // 获取命令行参数
 const [, , flowId] = process.argv;
 if (!flowId) {
-    console.log('请传入参数: node npmpkg.js <flow-xxxx>');
+    console.log('请传入参数: npx gcmsg <flow-xxxx>');
     process.exit(1);
 }
 
@@ -22,12 +23,29 @@ if (!fs.existsSync(path.join(currentDir, '.git'))) {
     process.exit(1);
 }
 
+// 执行命令的包装函数
+function execCommand(command, options = {}) {
+    try {
+        const defaultOptions = {
+            encoding: 'utf8',
+            maxBuffer: 1024 * 1024 * 10, // 10MB buffer
+            stdio: 'pipe'
+        };
+        return execSync(command, { ...defaultOptions, ...options });
+    } catch (error) {
+        if (error.stderr) {
+            console.error(`命令执行错误: ${error.stderr.toString()}`);
+        }
+        throw error;
+    }
+}
+
 // 主函数
 async function main() {
     try {
         // 获取 git diff 变更
-        const gitDiff = execSync('git diff', { encoding: 'utf-8' });
-
+        const gitDiff = execCommand('git diff');
+        
         if (gitDiff.trim() === '') {
             console.log('当前分支没有未提交的变更。');
             process.exit(0);
@@ -67,9 +85,9 @@ ${gitDiff}`;
                 temperature: 0.7
             })
         });
-
+        
         const data = await response.json();
-
+        
         if (!data.choices || !data.choices[0]) {
             console.log('API 响应格式错误:', data);
             process.exit(1);
@@ -82,16 +100,26 @@ ${gitDiff}`;
         // 复制到剪贴板
         try {
             // 使用临时文件来处理特殊字符
-            const tempFile = path.join(process.cwd(), '.temp_commit_msg');
+            const tempFile = path.join(os.tmpdir(), `.temp_commit_msg_${Date.now()}`);
             fs.writeFileSync(tempFile, commitMessage, 'utf8');
-            execSync(`cat "${tempFile}" | pbcopy`);
+            execCommand(`cat "${tempFile}" | pbcopy`);
             fs.unlinkSync(tempFile); // 删除临时文件
             console.log('\n✅ 已复制到剪贴板！');
         } catch (copyError) {
             console.log('\n❌ 复制到剪贴板失败:', copyError.message);
         }
 
+        // 执行 git add 和 commit
+        console.log('\n执行 git commit...');
+        execCommand('git add .');
+        execCommand(`git commit -m "${commitMessage.replace(/"/g, '\\"')}"`);
+        console.log('✅ 提交成功！');
+
     } catch (err) {
+        console.error('\n❌ 错误详情:');
+        if (err.stderr) {
+            console.error(err.stderr.toString());
+        }
         if (err.message.includes('git')) {
             console.log('获取 git diff 失败，请确认该目录为 git 仓库。');
         } else if (err.message.includes('fetch')) {
