@@ -15,14 +15,14 @@
     "gcmsg": "./gcmsg.js"
   },
   "files": [
-    "npmpkg.js",
+    "gcmsg.js",
     "index.js"
   ],
   "engines": {
     "node": ">=18.0.0"
   },
   "keywords": [],
-  "author": "chaowei.hou",
+  "author": "newweber@163.com",
   "license": "ISC",
   "dependencies": {
     "dotenv": "^16.5.0",

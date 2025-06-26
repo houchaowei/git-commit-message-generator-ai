@@ -119,7 +119,8 @@ ${gitDiff}`;
             {
                 type: 'confirm',
                 name: 'isCommit',
-                message: '是否执行 commit？'
+                message: '是否执行 commit？(default no)',
+                default: false,
             }
         ]);
 
@@ -142,7 +143,8 @@ ${gitDiff}`;
             {
                 type: 'confirm',
                 name: 'isPush',
-                message: '是否执行 git push？'
+                message: '是否执行 git push？(default no)',
+                default: false,
             }
         ]);
         if (!isPush.isPush) {
