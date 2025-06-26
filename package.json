@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node gcmsg.js",
+    "start": "node gcmsg.js flow-250626",
     "test": "echo \"Error: no test specified\"",
     "release": "standard-version",
     "release:minor": "standard-version --release-as minor",
