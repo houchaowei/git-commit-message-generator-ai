@@ -54,12 +54,29 @@ async function main() {
         if (gitDiff.trim() === '') {
             // 执行 git status 获取当前分支的文件列表
             const gitStatus = execCommand('git status');
-            const fileList = gitStatus.split('\n').filter(line => line.trim().startsWith('new file:'));
-            if (fileList.length > 0) {
+            // 新增时，输出的文本格式为：
+            // `On branch master...Untracked files:  (use "git add <file>..." to include in what will be committed)\t111.txt...nothing added to commit but untracked files present (use "git add" to track)`
+            // 优化文件过滤，支持 new file: 和 Untracked files: 两种格式
+            const statusLines = gitStatus.split('\n');
+            let inUntracked = false;
+            const newFiles = [];
+            for (let line of statusLines) {
+                line = line.trimEnd();
+                if (line.trim().startsWith('new file:')) {
+                    newFiles.push(line.replace('new file:', '').trim());
+                } else if (line.trim().startsWith('Untracked files:')) {
+                    inUntracked = true;
+                } else if (inUntracked) {
+                    if (line.startsWith('\t') && line.trim() && !line.includes('use "git add')) {
+                        newFiles.push(line.trim());
+                    } else if (!line.trim()) {
+                        inUntracked = false;
+                    }
+                }
+            }
+            if (newFiles.length > 0) {
                 console.log('当前分支有新增文件，需要分析新增文件的代码，生成 commit message');
-                // 1. 提取新增文件名
-                const newFiles = fileList.map(line => line.replace('new file:', '').trim());
-                // 2. 读取每个文件内容
+                // 1. 读取每个文件内容
                 let filesContent = '';
                 for (const file of newFiles) {
                     try {
@@ -75,14 +92,14 @@ async function main() {
                         filesContent += `文件: ${file}\n读取失败: ${e.message}\n\n`;
                     }
                 }
-                // 3. 构造 AI 提示词
+                // 2. 构造 AI 提示词
                 const message = `
 根据以下新增文件的代码内容，生成一个 git commit 信息，只需要返回文字和换行符，不需要返回其他的字符，需要包含：\n1. 新增了哪些文件及其主要功能\n2. 新增的业务或技术价值\n\n按照以下格式返回（使用实际的 flowId: ${flowId}）：\nfeat(${flowId}): 新增xxx功能\n\n    - 新增了xxx文件，实现了xxx功能\n    - 主要逻辑说明\n    - 业务或技术价值总结\n\n${filesContent}`;
                 if (!OPENAI_API_KEY) {
                     console.log('请设置 OPENAI_API_KEY 环境变量');
                     process.exit(1);
                 }
-                // 4. 调用 AI 接口生成 commit message
+                // 3. 调用 AI 接口生成 commit message
                 const response = await fetch(`${BASE_URL}/v1/chat/completions`, {
                     method: 'POST',
                     headers: {
@@ -103,7 +120,7 @@ async function main() {
                 const commitMessage = data.choices[0].message.content;
                 console.log('\n生成的 commit message:\n');
                 console.log(commitMessage);
-                // 5. 复制到剪贴板
+                // 4. 复制到剪贴板
                 try {
                     const tempFile = path.join(os.tmpdir(), `.temp_commit_msg_${Date.now()}`);
                     fs.writeFileSync(tempFile, commitMessage, 'utf8');
