@@ -2,6 +2,8 @@
 
 本文件记录项目的所有重要更新。格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)。
 
+### [1.6.1](https://github.com/houchaowei/git-commit-message-generator-ai/compare/v1.6.0...v1.6.1) (2025-06-26)
+
 ### [1.5.7](https://github.com/houchaowei/git-commit-message-generator-ai/compare/v1.5.5...v1.5.7) (2025-06-26)
 
 
