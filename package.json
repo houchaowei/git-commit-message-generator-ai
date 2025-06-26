@@ -1,23 +1,23 @@
 {
   "name": "generator-commit-message",
-  "version": "1.5.6",
+  "version": "1.5.7",
   "description": "",
-  "main": "index.js",
+  "main": "dist/gcmsg.js",
   "type": "module",
   "scripts": {
     "start": "node gcmsg.js flow-250626",
     "test": "echo \"Error: no test specified\"",
+    "build": "gulp",
     "release": "standard-version",
     "release:minor": "standard-version --release-as minor",
     "release:major": "standard-version --release-as major",
     "release:patch": "standard-version --release-as patch"
   },
   "bin": {
-    "gcmsg": "./gcmsg.js"
+    "gcmsg": "./dist/gcmsg.js"
   },
   "files": [
-    "gcmsg.js",
-    "index.js"
+    "dist"
   ],
   "engines": {
     "node": ">=18.0.0"
@@ -30,6 +30,11 @@
     "inquirer": "^12.6.3"
   },
   "devDependencies": {
+    "gulp": "^5.0.1",
+    "gulp-babel": "^8.0.0",
+    "gulp-less": "^5.0.0",
+    "gulp-uglify": "^3.0.2",
+    "del": "^8.0.0",
     "standard-version": "^9.5.0"
   },
   "standard-version": {
