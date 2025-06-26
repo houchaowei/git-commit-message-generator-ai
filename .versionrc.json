@@ -1,0 +1,21 @@
+{
+  "types": [
+    {"type": "feat", "section": "新功能"},
+    {"type": "fix", "section": "Bug 修复"},
+    {"type": "docs", "section": "文档"},
+    {"type": "style", "section": "代码样式"},
+    {"type": "refactor", "section": "重构"},
+    {"type": "perf", "section": "性能优化"},
+    {"type": "test", "section": "测试"},
+    {"type": "build", "section": "构建"},
+    {"type": "ci", "section": "持续集成"},
+    {"type": "chore", "section": "其他"}
+  ],
+  "commitUrlFormat": "{{host}}/{{owner}}/{{repository}}/commit/{{hash}}",
+  "compareUrlFormat": "{{host}}/{{owner}}/{{repository}}/compare/{{previousTag}}...{{currentTag}}",
+  "issueUrlFormat": "{{host}}/{{owner}}/{{repository}}/issues/{{id}}",
+  "userUrlFormat": "{{host}}/{{user}}",
+  "releaseCommitMessageFormat": "chore(release): {{currentTag}} [skip ci]",
+  "issuePrefixes": ["#"],
+  "header": "# 更新日志\n\n本文件记录项目的所有重要更新。格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)。\n"
+} 

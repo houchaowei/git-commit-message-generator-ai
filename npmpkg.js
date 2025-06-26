@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
 import os from 'os';
+import inquirer from 'inquirer';
 
 dotenv.config();
 
@@ -113,12 +114,43 @@ ${gitDiff}`;
             console.log('\n❌ 复制到剪贴板失败:', copyError.message);
         }
 
-        // 执行 git add 和 commit
-        console.log('\n执行 git commit...');
-        execCommand('git add .');
-        execCommand(`git commit -m "${commitMessage.replace(/"/g, '\\"')}"`);
-        console.log('✅ 提交成功！');
+        // 给用户选择是否执行 commit
+        const isCommit = await inquirer.prompt([
+            {
+                type: 'confirm',
+                name: 'isCommit',
+                message: '是否执行 commit？'
+            }
+        ]);
 
+        if (!isCommit.isCommit) {
+            console.log('❌ 用户选择不执行 commit');
+            process.exit(0);
+        }
+
+        // 执行 git add 和 commit
+        console.log('\n执行 git add...');
+        execCommand('git add .');
+        console.log('✅ git add 成功！');
+        
+        console.log('\n执行 git commit...');
+        execCommand(`git commit -m "${commitMessage.replace(/"/g, '\\"')}"`);
+        console.log('✅ commit 成功！');
+
+        // 选择是否执行 git push
+        const isPush = await inquirer.prompt([
+            {
+                type: 'confirm',
+                name: 'isPush',
+                message: '是否执行 git push？'
+            }
+        ]);
+        if (!isPush.isPush) {
+            console.log('❌ 用户选择不执行 git push');
+            process.exit(0);
+        }
+        execCommand('git push');
+        console.log('✅ push 成功！');
     } catch (err) {
         console.error('\n❌ 错误详情:');
         if (err.stderr) {
