@@ -7,7 +7,7 @@ import os from 'os';
 
 dotenv.config();
 
-const { OPENAI_API_KEY } = process.env;
+const { OPENAI_API_KEY, BASE_URL } = process.env;
 
 // 获取命令行参数
 const [, , flowId] = process.argv;
@@ -24,7 +24,11 @@ if (!fs.existsSync(path.join(currentDir, '.git'))) {
 }
 
 // 执行命令的包装函数
-function execCommand(command, options = {}) {
+function execCommand(command, options = {
+    encoding: 'utf8',
+    maxBuffer: 1024 * 1024 * 10, // 10MB buffer
+    stdio: 'pipe'
+}) {
     try {
         const defaultOptions = {
             encoding: 'utf8',
@@ -73,7 +77,7 @@ ${gitDiff}`;
         }
 
         // 调用 API 生成 commit message
-        const response = await fetch('https://api.chatanywhere.tech/v1/chat/completions', {
+        const response = await fetch(`${BASE_URL}/v1/chat/completions`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
