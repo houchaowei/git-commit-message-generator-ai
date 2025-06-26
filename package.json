@@ -1,10 +1,11 @@
 {
   "name": "generator-commit-message",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "",
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "start": "node gcmsg.js",
     "test": "echo \"Error: no test specified\"",
     "release": "standard-version",
     "release:minor": "standard-version --release-as minor",

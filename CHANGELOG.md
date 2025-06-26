@@ -2,6 +2,13 @@
 
 本文件记录项目的所有重要更新。格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)。
 
+### [1.5.2](https://github.com/houchaowei/git-commit-message-generator-ai/compare/v1.5.1...v1.5.2) (2025-06-26)
+
+
+### 新功能
+
+* **feat-250626:** 新增 git 状态分析功能 ([a73647c](https://github.com/houchaowei/git-commit-message-generator-ai/commit/a73647cea59799a7071bc21ffd2eaa343839596b))
+
 ## 1.5.0 (2025-06-26)
 
 
