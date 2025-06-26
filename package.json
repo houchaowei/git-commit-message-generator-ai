@@ -12,7 +12,7 @@
     "release:patch": "standard-version --release-as patch"
   },
   "bin": {
-    "gcmsg": "./npmpkg.js"
+    "gcmsg": "./gcmsg.js"
   },
   "files": [
     "npmpkg.js",

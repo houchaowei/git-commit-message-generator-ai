@@ -50,7 +50,7 @@ async function main() {
     try {
         // 获取 git diff 变更
         const gitDiff = execCommand('git diff');
-        
+
         if (gitDiff.trim() === '') {
             console.log('当前分支没有未提交的变更。');
             process.exit(0);
@@ -90,9 +90,9 @@ ${gitDiff}`;
                 temperature: 0.7
             })
         });
-        
+
         const data = await response.json();
-        
+
         if (!data.choices || !data.choices[0]) {
             console.log('API 响应格式错误:', data);
             process.exit(1);
@@ -132,7 +132,7 @@ ${gitDiff}`;
         console.log('\n执行 git add...');
         execCommand('git add .');
         console.log('✅ git add 成功！');
-        
+
         console.log('\n执行 git commit...');
         execCommand(`git commit -m "${commitMessage.replace(/"/g, '\\"')}"`);
         console.log('✅ commit 成功！');
