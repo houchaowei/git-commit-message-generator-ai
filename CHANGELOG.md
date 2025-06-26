@@ -2,6 +2,21 @@
 
 本文件记录项目的所有重要更新。格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)。
 
+## 1.4.0 (2025-06-26)
+
+
+### Bug 修复
+
+* **flow-22914:** 修复命令行参数输出和临时文件处理 ([9e92418](https://github.com/houchaowei/git-commit-message-generator-ai/commit/9e924188da329a1b5addf5af521bfacf5e9802d7))
+* **flow-22914:** 修复命令行参数提示和 git 仓库检查逻辑 ([7eb4262](https://github.com/houchaowei/git-commit-message-generator-ai/commit/7eb42628248550a1accad779534e89a4eb3eaf34))
+* **flow-22914:** 修改包管理相关配置 ([8403e79](https://github.com/houchaowei/git-commit-message-generator-ai/commit/8403e793fea01739a84ef9770618ba6f41c1033e))
+
+
+### 新功能
+
+* **debug-22914:** 增强 AI Git Commit Message 生成工具功能 ([429e737](https://github.com/houchaowei/git-commit-message-generator-ai/commit/429e737baa58207ef600fdcca14838a448e29bbe))
+* **feat-250626:** 增强 npm 包管理功能 ([e3442f0](https://github.com/houchaowei/git-commit-message-generator-ai/commit/e3442f058530b90f0ddc4952ed9e536a20ea9154))
+
 ## [1.3.0](https://github.com/houchaowei/git-commit-message-generator-ai/compare/v1.0.5...v1.3.0) (2025-06-26)
 
 
