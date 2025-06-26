@@ -45,195 +45,131 @@ function execCommand(command, options = {
     }
 }
 
-// 主函数
+// 通用处理函数：AI 生成、复制、commit、push
+async function generateCommitMessageAndHandle({ prompt, aiContent }) {
+    if (!OPENAI_API_KEY) {
+        console.log('请设置 OPENAI_API_KEY 环境变量');
+        process.exit(1);
+    }
+    const message = prompt + '\n' + aiContent;
+    const response = await fetch(`${BASE_URL}/v1/chat/completions`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${OPENAI_API_KEY}`
+        },
+        body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            messages: [{ role: 'user', content: message }],
+            temperature: 0.7
+        })
+    });
+    const data = await response.json();
+    if (!data.choices || !data.choices[0]) {
+        console.log('API 响应格式错误:', data);
+        process.exit(1);
+    }
+    const commitMessage = data.choices[0].message.content;
+    console.log('\n生成的 commit message:\n');
+    console.log(commitMessage);
+    // 复制到剪贴板
+    try {
+        const tempFile = path.join(os.tmpdir(), `.temp_commit_msg_${Date.now()}`);
+        fs.writeFileSync(tempFile, commitMessage, 'utf8');
+        execCommand(`cat "${tempFile}" | pbcopy`);
+        fs.unlinkSync(tempFile);
+        console.log('\n✅ 已复制到剪贴板！');
+    } catch (copyError) {
+        console.log('\n❌ 复制到剪贴板失败:', copyError.message);
+    }
+    // 询问是否 commit
+    const isCommit = await inquirer.prompt([
+        {
+            type: 'confirm',
+            name: 'isCommit',
+            message: '是否执行 commit？(default no)',
+            default: false,
+        }
+    ]);
+    if (!isCommit.isCommit) {
+        console.log('❌ 用户选择不执行 commit');
+        process.exit(0);
+    }
+    // 执行 git add 和 commit
+    console.log('\n执行 git add...');
+    execCommand('git add .');
+    console.log('✅ git add 成功！');
+    console.log('\n执行 git commit...');
+    execCommand(`git commit -m "${commitMessage.replace(/"/g, '\"')}"`);
+    console.log('✅ commit 成功！');
+    // 询问是否 push
+    const isPush = await inquirer.prompt([
+        {
+            type: 'confirm',
+            name: 'isPush',
+            message: '是否执行 git push？(default no)',
+            default: false,
+        }
+    ]);
+    if (!isPush.isPush) {
+        console.log('❌ 用户选择不执行 git push');
+        process.exit(0);
+    }
+    execCommand('git push');
+    console.log('✅ push 成功！');
+}
+
+// 主流程重构
 async function main() {
     try {
         // 获取 git diff 变更
         const gitDiff = execCommand('git diff');
-
-        if (gitDiff.trim() === '') {
-            // 执行 git status 获取当前分支的文件列表
-            const gitStatus = execCommand('git status');
-            // 新增时，输出的文本格式为：
-            // `On branch master...Untracked files:  (use "git add <file>..." to include in what will be committed)\t111.txt...nothing added to commit but untracked files present (use "git add" to track)`
-            // 优化文件过滤，支持 new file: 和 Untracked files: 两种格式
-            const statusLines = gitStatus.split('\n');
-            let inUntracked = false;
-            const newFiles = [];
-            for (let line of statusLines) {
-                line = line.trimEnd();
-                if (line.trim().startsWith('new file:')) {
-                    newFiles.push(line.replace('new file:', '').trim());
-                } else if (line.trim().startsWith('Untracked files:')) {
-                    inUntracked = true;
-                } else if (inUntracked) {
-                    if (line.startsWith('\t') && line.trim() && !line.includes('use "git add')) {
-                        newFiles.push(line.trim());
-                    } else if (!line.trim()) {
-                        inUntracked = false;
-                    }
+        // 执行 git status 获取当前分支的文件列表
+        const gitStatus = execCommand('git status');
+        // 优化文件过滤，支持 new file: 和 Untracked files: 两种格式
+        const statusLines = gitStatus.split('\n');
+        let inUntracked = false;
+        const newFiles = [];
+        for (let line of statusLines) {
+            line = line.trimEnd();
+            if (line.trim().startsWith('new file:')) {
+                newFiles.push(line.replace('new file:', '').trim());
+            } else if (line.trim().startsWith('Untracked files:')) {
+                inUntracked = true;
+            } else if (inUntracked) {
+                if (line.startsWith('\t') && line.trim() && !line.includes('use "git add')) {
+                    newFiles.push(line.trim());
+                } else if (!line.trim()) {
+                    inUntracked = false;
                 }
             }
-            if (newFiles.length > 0) {
-                console.log('当前分支有新增文件，需要分析新增文件的代码，生成 commit message');
-                // 1. 读取每个文件内容
-                let filesContent = '';
-                for (const file of newFiles) {
-                    try {
-                        const content = fs.readFileSync(path.join(currentDir, file), 'utf8');
-                        // 若内容过长，截断前后各 200 行
-                        const lines = content.split('\n');
-                        let displayContent = content;
-                        if (lines.length > 400) {
-                            displayContent = lines.slice(0, 200).join('\n') + '\n...\n' + lines.slice(-200).join('\n');
-                        }
-                        filesContent += `文件: ${file}\n内容:\n${displayContent}\n\n`;
-                    } catch (e) {
-                        filesContent += `文件: ${file}\n读取失败: ${e.message}\n\n`;
-                    }
-                }
-                // 2. 构造 AI 提示词
-                const message = `
-根据以下新增文件的代码内容，生成一个 git commit 信息，只需要返回文字和换行符，不需要返回其他的字符，需要包含：\n1. 新增了哪些文件及其主要功能\n2. 新增的业务或技术价值\n\n按照以下格式返回（使用实际的 flowId: ${flowId}）：\nfeat(${flowId}): 新增xxx功能\n\n    - 新增了xxx文件，实现了xxx功能\n    - 主要逻辑说明\n    - 业务或技术价值总结\n\n${filesContent}`;
-                if (!OPENAI_API_KEY) {
-                    console.log('请设置 OPENAI_API_KEY 环境变量');
-                    process.exit(1);
-                }
-                // 3. 调用 AI 接口生成 commit message
-                const response = await fetch(`${BASE_URL}/v1/chat/completions`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${OPENAI_API_KEY}`
-                    },
-                    body: JSON.stringify({
-                        model: 'gpt-4o-mini',
-                        messages: [{ role: 'user', content: message }],
-                        temperature: 0.7
-                    })
-                });
-                const data = await response.json();
-                if (!data.choices || !data.choices[0]) {
-                    console.log('API 响应格式错误:', data);
-                    process.exit(1);
-                }
-                const commitMessage = data.choices[0].message.content;
-                console.log('\n生成的 commit message:\n');
-                console.log(commitMessage);
-                // 4. 复制到剪贴板
+        }
+        if (gitDiff.trim() !== '') {
+            // 有 diff，走变更分析
+            const prompt = `根据以下 git diff 变更，生成一个 git commit 信息，只需要返回文字和换行符，不需要返回其他的字符，需要包含：\n1. 变更修改的内容\n2. 变更修改的原因\n\n按照以下格式返回（使用实际的 flowId: ${flowId}）：\nfix(${flowId}): 修复xxx问题\n\n    - 详细变更点1\n    - 详细变更点2\n    - 详细变更点3\n    - 变更影响和意义总结\n`;
+            await generateCommitMessageAndHandle({ prompt, aiContent: gitDiff });
+        } else if (newFiles.length > 0) {
+            // 有新增文件，走新增分析
+            let filesContent = '';
+            for (const file of newFiles) {
                 try {
-                    const tempFile = path.join(os.tmpdir(), `.temp_commit_msg_${Date.now()}`);
-                    fs.writeFileSync(tempFile, commitMessage, 'utf8');
-                    execCommand(`cat "${tempFile}" | pbcopy`);
-                    fs.unlinkSync(tempFile);
-                    console.log('\n✅ 已复制到剪贴板！');
-                } catch (copyError) {
-                    console.log('\n❌ 复制到剪贴板失败:', copyError.message);
+                    const content = fs.readFileSync(path.join(currentDir, file), 'utf8');
+                    const lines = content.split('\n');
+                    let displayContent = content;
+                    if (lines.length > 400) {
+                        displayContent = lines.slice(0, 200).join('\n') + '\n...\n' + lines.slice(-200).join('\n');
+                    }
+                    filesContent += `文件: ${file}\n内容:\n${displayContent}\n\n`;
+                } catch (e) {
+                    filesContent += `文件: ${file}\n读取失败: ${e.message}\n\n`;
                 }
-                process.exit(0);
-            } else {
-                console.log('当前分支没有新增文件，也没有未提交的变更。');
-                process.exit(0);
             }
-        }
-
-        // 构建提示信息
-        const message = `
-根据以下 git diff 变更，生成一个 git commit 信息，只需要返回文字和换行符，不需要返回其他的字符，需要包含：
-1. 变更修改的内容
-2. 变更修改的原因
-
-按照以下格式返回（使用实际的 flowId: ${flowId}）：
-fix(${flowId}): 修复购物车数量更新时的状态同步问题
-
-    - 解决了购物车组件在数量变更时状态不同步的问题
-    - 优化了购物车数据更新的时序处理逻辑
-    - 修复了并发更新导致的数据不一致问题
-    - 确保购物车状态在各个组件间的正确同步
-
-${gitDiff}`;
-
-        if (!OPENAI_API_KEY) {
-            console.log('请设置 OPENAI_API_KEY 环境变量');
-            process.exit(1);
-        }
-
-        // 调用 API 生成 commit message
-        const response = await fetch(`${BASE_URL}/v1/chat/completions`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${OPENAI_API_KEY}`
-            },
-            body: JSON.stringify({
-                model: 'gpt-4o-mini', // 免费版支持deepseek, gpt-3.5-turbo, embedding, gpt-4o-mini, gpt-4o。
-                messages: [{ role: 'user', content: message }],
-                temperature: 0.7
-            })
-        });
-
-        const data = await response.json();
-
-        if (!data.choices || !data.choices[0]) {
-            console.log('API 响应格式错误:', data);
-            process.exit(1);
-        }
-
-        const commitMessage = data.choices[0].message.content;
-        console.log('\n生成的 commit message:\n');
-        console.log(commitMessage);
-
-        // 复制到剪贴板
-        try {
-            // 使用临时文件来处理特殊字符
-            const tempFile = path.join(os.tmpdir(), `.temp_commit_msg_${Date.now()}`);
-            fs.writeFileSync(tempFile, commitMessage, 'utf8');
-            execCommand(`cat "${tempFile}" | pbcopy`);
-            fs.unlinkSync(tempFile); // 删除临时文件
-            console.log('\n✅ 已复制到剪贴板！');
-        } catch (copyError) {
-            console.log('\n❌ 复制到剪贴板失败:', copyError.message);
-        }
-
-        // 给用户选择是否执行 commit
-        const isCommit = await inquirer.prompt([
-            {
-                type: 'confirm',
-                name: 'isCommit',
-                message: '是否执行 commit？(default no)',
-                default: false,
-            }
-        ]);
-
-        if (!isCommit.isCommit) {
-            console.log('❌ 用户选择不执行 commit');
+            const prompt = `根据以下新增文件的代码内容，生成一个 git commit 信息，只需要返回文字和换行符，不需要返回其他的字符，需要包含：\n1. 新增了哪些文件及其主要功能\n2. 新增的业务或技术价值\n\n按照以下格式返回（使用实际的 flowId: ${flowId}）：\nfeat(${flowId}): 新增xxx功能\n\n    - 新增了xxx文件，实现了xxx功能\n    - 主要逻辑说明\n    - 业务或技术价值总结\n`;
+            await generateCommitMessageAndHandle({ prompt, aiContent: filesContent });
+        } else {
+            console.log('当前分支没有新增文件，也没有未提交的变更。');
             process.exit(0);
         }
-
-        // 执行 git add 和 commit
-        console.log('\n执行 git add...');
-        execCommand('git add .');
-        console.log('✅ git add 成功！');
-
-        console.log('\n执行 git commit...');
-        execCommand(`git commit -m "${commitMessage.replace(/"/g, '\\"')}"`);
-        console.log('✅ commit 成功！');
-
-        // 选择是否执行 git push
-        const isPush = await inquirer.prompt([
-            {
-                type: 'confirm',
-                name: 'isPush',
-                message: '是否执行 git push？(default no)',
-                default: false,
-            }
-        ]);
-        if (!isPush.isPush) {
-            console.log('❌ 用户选择不执行 git push');
-            process.exit(0);
-        }
-        execCommand('git push');
-        console.log('✅ push 成功！');
     } catch (err) {
         console.error('\n❌ 错误详情:');
         if (err.stderr) {
