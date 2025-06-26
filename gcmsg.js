@@ -52,6 +52,69 @@ async function main() {
         const gitDiff = execCommand('git diff');
 
         if (gitDiff.trim() === '') {
+            // 执行 git status 获取当前分支的文件列表
+            const gitStatus = execCommand('git status');
+            const fileList = gitStatus.split('\n').filter(line => line.trim().startsWith('new file:'));
+            if (fileList.length > 0) {
+                console.log('当前分支有新增文件，需要分析新增文件的代码，生成 commit message');
+                // 1. 提取新增文件名
+                const newFiles = fileList.map(line => line.replace('new file:', '').trim());
+                // 2. 读取每个文件内容
+                let filesContent = '';
+                for (const file of newFiles) {
+                    try {
+                        const content = fs.readFileSync(path.join(currentDir, file), 'utf8');
+                        // 若内容过长，截断前后各 200 行
+                        const lines = content.split('\n');
+                        let displayContent = content;
+                        if (lines.length > 400) {
+                            displayContent = lines.slice(0, 200).join('\n') + '\n...\n' + lines.slice(-200).join('\n');
+                        }
+                        filesContent += `文件: ${file}\n内容:\n${displayContent}\n\n`;
+                    } catch (e) {
+                        filesContent += `文件: ${file}\n读取失败: ${e.message}\n\n`;
+                    }
+                }
+                // 3. 构造 AI 提示词
+                const message = `
+根据以下新增文件的代码内容，生成一个 git commit 信息，只需要返回文字和换行符，不需要返回其他的字符，需要包含：\n1. 新增了哪些文件及其主要功能\n2. 新增的业务或技术价值\n\n按照以下格式返回（使用实际的 flowId: ${flowId}）：\nfeat(${flowId}): 新增xxx功能\n\n    - 新增了xxx文件，实现了xxx功能\n    - 主要逻辑说明\n    - 业务或技术价值总结\n\n${filesContent}`;
+                if (!OPENAI_API_KEY) {
+                    console.log('请设置 OPENAI_API_KEY 环境变量');
+                    process.exit(1);
+                }
+                // 4. 调用 AI 接口生成 commit message
+                const response = await fetch(`${BASE_URL}/v1/chat/completions`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${OPENAI_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-4o-mini',
+                        messages: [{ role: 'user', content: message }],
+                        temperature: 0.7
+                    })
+                });
+                const data = await response.json();
+                if (!data.choices || !data.choices[0]) {
+                    console.log('API 响应格式错误:', data);
+                    process.exit(1);
+                }
+                const commitMessage = data.choices[0].message.content;
+                console.log('\n生成的 commit message:\n');
+                console.log(commitMessage);
+                // 5. 复制到剪贴板
+                try {
+                    const tempFile = path.join(os.tmpdir(), `.temp_commit_msg_${Date.now()}`);
+                    fs.writeFileSync(tempFile, commitMessage, 'utf8');
+                    execCommand(`cat "${tempFile}" | pbcopy`);
+                    fs.unlinkSync(tempFile);
+                    console.log('\n✅ 已复制到剪贴板！');
+                } catch (copyError) {
+                    console.log('\n❌ 复制到剪贴板失败:', copyError.message);
+                }
+                process.exit(0);
+            }
             console.log('当前分支没有未提交的变更。');
             process.exit(0);
         }
