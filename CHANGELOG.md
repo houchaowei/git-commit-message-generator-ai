@@ -2,6 +2,25 @@
 
 本文件记录项目的所有重要更新。格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)。
 
+### [1.5.3](https://github.com/houchaowei/git-commit-message-generator-ai/compare/v1.5.1...v1.5.3) (2025-06-26)
+
+
+### 新功能
+
+* **feat-250626:** 新增 git 状态分析功能 ([a73647c](https://github.com/houchaowei/git-commit-message-generator-ai/commit/a73647cea59799a7071bc21ffd2eaa343839596b))
+
+
+### 其他
+
+* **release:** 1.5.2 [skip ci] ([93b3fd0](https://github.com/houchaowei/git-commit-message-generator-ai/commit/93b3fd03447ab375dc74e5b22d8c76086b8f7412))
+
+
+### Bug 修复
+
+* **flow-250626:** 修复 gcmsg.js 中的状态提示逻辑 ([d844612](https://github.com/houchaowei/git-commit-message-generator-ai/commit/d8446124ac1a54c523b287a69ba172bfc451c96a))
+* **flow-250626:** 修复启动脚本以支持特定流程 ID ([baa5fac](https://github.com/houchaowei/git-commit-message-generator-ai/commit/baa5fac9c27c71680d1d1f31cc3a56f1a2d10aeb))
+* **flow-250626:** 优化 git 状态处理逻辑以支持新文件检测 ([0c856d8](https://github.com/houchaowei/git-commit-message-generator-ai/commit/0c856d8ca8ec07ab721adf29bf1c430b7cff8c1b))
+
 ### [1.5.2](https://github.com/houchaowei/git-commit-message-generator-ai/compare/v1.5.1...v1.5.2) (2025-06-26)
 
 
