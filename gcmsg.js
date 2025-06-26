@@ -131,9 +131,10 @@ async function main() {
                     console.log('\n❌ 复制到剪贴板失败:', copyError.message);
                 }
                 process.exit(0);
+            } else {
+                console.log('当前分支没有新增文件，也没有未提交的变更。');
+                process.exit(0);
             }
-            console.log('当前分支没有未提交的变更。');
-            process.exit(0);
         }
 
         // 构建提示信息
