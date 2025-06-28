@@ -2,6 +2,26 @@
 
 本文件记录项目的所有重要更新。格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)。
 
+## [1.8.0](https://github.com/houchaowei/git-commit-message-generator-ai/compare/v1.6.0...v1.8.0) (2025-06-28)
+
+
+### 新功能
+
+* **feat-250628:** 更新 README 文档内容和结构 ([fe43fa3](https://github.com/houchaowei/git-commit-message-generator-ai/commit/fe43fa3cb458988b03f1aca35259cc4b0861e04b))
+
+
+### 其他
+
+* **release:** 1.6.1 [skip ci] ([d829d2f](https://github.com/houchaowei/git-commit-message-generator-ai/commit/d829d2fdf527adfd418db0e9fe1e1c88ce43dcec))
+* **release:** 1.6.2 [skip ci] ([390329c](https://github.com/houchaowei/git-commit-message-generator-ai/commit/390329c65f23fde71396fa56c34a99f950954011))
+* **release:** 1.7.0 [skip ci] ([5858623](https://github.com/houchaowei/git-commit-message-generator-ai/commit/5858623b53e70dbafa16c24058d788982f9c334c))
+
+
+### Bug 修复
+
+* **feat-250628:** 修复工具配置与模型环境变量适配问题 ([d91ee22](https://github.com/houchaowei/git-commit-message-generator-ai/commit/d91ee22eeadb3375a72ac232260703663c999f6e))
+* **flow-250628:** 修复命令使用和可执行文件配置问题 ([450d5c8](https://github.com/houchaowei/git-commit-message-generator-ai/commit/450d5c81a0dd601393aac31d9ddf20a253c435ed))
+
 ## [1.7.0](https://github.com/houchaowei/git-commit-message-generator-ai/compare/v1.6.0...v1.7.0) (2025-06-28)
 
 

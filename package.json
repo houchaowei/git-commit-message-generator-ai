@@ -1,6 +1,6 @@
 {
   "name": "generator-commit-message",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "description": "基于 AI 的 Git Commit Message 生成工具，可以根据 git diff 的内容自动生成规范的 commit message。",
   "main": "dist/gcmsg.js",
   "type": "module",
