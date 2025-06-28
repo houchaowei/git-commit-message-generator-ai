@@ -2,6 +2,18 @@
 
 本文件记录项目的所有重要更新。格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)。
 
+### [1.6.2](https://github.com/houchaowei/git-commit-message-generator-ai/compare/v1.6.0...v1.6.2) (2025-06-28)
+
+
+### 其他
+
+* **release:** 1.6.1 [skip ci] ([d829d2f](https://github.com/houchaowei/git-commit-message-generator-ai/commit/d829d2fdf527adfd418db0e9fe1e1c88ce43dcec))
+
+
+### Bug 修复
+
+* **feat-250628:** 修复工具配置与模型环境变量适配问题 ([d91ee22](https://github.com/houchaowei/git-commit-message-generator-ai/commit/d91ee22eeadb3375a72ac232260703663c999f6e))
+
 ### [1.6.1](https://github.com/houchaowei/git-commit-message-generator-ai/compare/v1.6.0...v1.6.1) (2025-06-26)
 
 ### [1.5.7](https://github.com/houchaowei/git-commit-message-generator-ai/compare/v1.5.5...v1.5.7) (2025-06-26)
