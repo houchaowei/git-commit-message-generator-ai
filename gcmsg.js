@@ -59,7 +59,7 @@ async function generateCommitMessageAndHandle({ prompt, aiContent }) {
             'Authorization': `Bearer ${OPENAI_API_KEY}`
         },
         body: JSON.stringify({
-            model: 'gpt-4o-mini',
+            model: process.env.MODEL,
             messages: [{ role: 'user', content: message }],
             temperature: 0.7
         })

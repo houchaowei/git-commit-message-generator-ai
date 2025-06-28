@@ -1,20 +1,21 @@
 {
   "name": "generator-commit-message",
   "version": "1.6.1",
-  "description": "",
+  "description": "基于 AI 的 Git Commit Message 生成工具，可以根据 git diff 的内容自动生成规范的 commit message。",
   "main": "dist/gcmsg.js",
   "type": "module",
   "scripts": {
     "start": "node gcmsg.js flow-250626",
     "test": "echo \"Error: no test specified\"",
     "build": "gulp",
+    "pub": "npm run build && npm run release",
     "release": "standard-version",
     "release:minor": "standard-version --release-as minor",
     "release:major": "standard-version --release-as major",
     "release:patch": "standard-version --release-as patch"
   },
   "bin": {
-    "gcmsg": "./dist/gcmsg.js"
+    "gcmsg": "dist/gcmsg.js"
   },
   "files": [
     "dist"
