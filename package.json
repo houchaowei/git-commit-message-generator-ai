@@ -15,7 +15,7 @@
     "release:patch": "standard-version --release-as patch"
   },
   "bin": {
-    "gcmsg": "dist/gcmsg.js",
+    "gcm": "dist/gcmsg.js",
     "generate-commit-message": "dist/gcmsg.js"
   },
   "files": [

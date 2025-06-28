@@ -50,9 +50,11 @@ export MODEL=gpt-3.5-turbo
 
 ```bash
 # 使用全局安装的命令
-gcmsg flow-22914
+gcm flow-22914
 
-# 或使用 npx
+# 或使用 npx（无需全局安装）
+npx gcm flow-22914
+# 或者使用完整包名
 npx generator-commit-message flow-22914
 ```
 
