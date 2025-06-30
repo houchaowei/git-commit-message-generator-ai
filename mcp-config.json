@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "git-commit-generator": {
+      "command": "node",
+      "args": ["src/mcp.js"],
+      "env": {
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}",
+        "BASE_URL": "${BASE_URL:-https://api.openai.com}",
+        "MODEL": "${MODEL:-gpt-3.5-turbo}"
+      }
+    }
+  }
+} 
