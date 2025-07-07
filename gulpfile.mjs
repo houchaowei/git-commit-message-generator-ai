@@ -4,7 +4,7 @@ import uglify from 'gulp-uglify'
 import { deleteAsync } from 'del'
 
 function js_build() {
-    return gulp.src("gcmsg.js")
+    return gulp.src("src/**/*.*")
         .pipe(babel())                //语法编译
         .pipe(uglify())               //代码压缩
         .pipe(gulp.dest("dist"));

@@ -16,7 +16,8 @@
   },
   "bin": {
     "gcm": "dist/gcmsg.js",
-    "generate-commit-message": "dist/gcmsg.js"
+    "generate-commit-message": "dist/gcmsg.js",
+    "trans": "dist/translate.js"
   },
   "files": [
     "dist"
@@ -29,14 +30,14 @@
   "license": "ISC",
   "dependencies": {
     "dotenv": "^16.5.0",
-    "inquirer": "^12.6.3"
+    "inquirer": "^12.7.0"
   },
   "devDependencies": {
+    "del": "^8.0.0",
     "gulp": "^5.0.1",
     "gulp-babel": "^8.0.0",
     "gulp-less": "^5.0.0",
     "gulp-uglify": "^3.0.2",
-    "del": "^8.0.0",
     "standard-version": "^9.5.0"
   },
   "standard-version": {

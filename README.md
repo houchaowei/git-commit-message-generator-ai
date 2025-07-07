@@ -10,6 +10,7 @@
 - 📋 **便捷复制**：自动复制生成的 commit message 到剪贴板
 - 🚀 **一站式操作**：支持交互式 git add、commit 和 push
 - ⚡️ **快速易用**：一条命令完成从分析到提交的全流程
+- 🌐 **翻译功能**：支持多语言文本翻译，基于有道云翻译API
 
 ## 📦 安装
 
@@ -34,6 +35,10 @@ npx generator-commit-message flow-xxxx
 OPENAI_API_KEY=your_api_key_here
 BASE_URL=your_api_base_url_here
 MODEL=gpt-3.5-turbo
+
+# 翻译功能配置（可选）
+YOUDAO_APP_KEY=your_youdao_app_key
+YOUDAO_APP_SECRET=your_youdao_app_secret
 ```
 
 或者直接设置环境变量：
@@ -42,6 +47,8 @@ MODEL=gpt-3.5-turbo
 export OPENAI_API_KEY=your_api_key_here
 export BASE_URL=your_api_base_url_here
 export MODEL=gpt-3.5-turbo
+export YOUDAO_APP_KEY=your_youdao_app_key
+export YOUDAO_APP_SECRET=your_youdao_app_secret
 ```
 
 ### 2. 使用方法
@@ -56,6 +63,11 @@ gcm flow-22914
 npx gcm flow-22914
 # 或者使用完整包名
 npx generator-commit-message flow-22914
+
+# 使用翻译功能
+trans "Hello world"
+# 或交互式使用
+trans
 ```
 
 ### 3. 工作流程
@@ -105,6 +117,8 @@ npx generator-commit-message flow-22914
 | `OPENAI_API_KEY` | ✅ | OpenAI API 密钥 | `sk-xxxxxxxxxxxx` |
 | `BASE_URL` | ✅ | API 服务地址 | `https://api.openai.com` |
 | `MODEL` | ✅ | 使用的 AI 模型 | `gpt-3.5-turbo` |
+| `YOUDAO_APP_KEY` | ❌ | 有道云翻译应用ID | `xxxxxxxx` |
+| `YOUDAO_APP_SECRET` | ❌ | 有道云翻译应用密钥 | `xxxxxxxxxxxxxxxx` |
 
 ## 📋 系统要求
 
@@ -151,6 +165,25 @@ feat(flow-22914): 新增用户权限管理模块
 ? 是否执行 commit？(default no) (y/N)
 ```
 
+### 翻译功能使用
+```bash
+# 直接翻译文本
+$ trans "Hello world"
+正在翻译...
+
+原文: Hello world
+译文: 你好世界
+
+# 交互式翻译
+$ trans
+? 请输入要翻译的文本: Hello world
+? 请选择翻译方向: 自动检测 → 中文
+正在翻译...
+
+原文: Hello world
+译文: 你好世界
+```
+
 ## ❓ 常见问题
 
 ### Q: 提示"当前目录不是 git 仓库"
@@ -171,11 +204,15 @@ feat(flow-22914): 新增用户权限管理模块
 ### Q: 复制到剪贴板失败
 **A**: 在 macOS 上需要 `pbcopy` 命令支持，该功能在其他操作系统上可能需要额外配置。
 
+### Q: 翻译功能无法使用
+**A**: 确保已正确配置有道云翻译API的密钥，可在 `.env` 文件或全局 `.gcm-config` 文件中设置。
+
 ## 🔗 相关链接
 
 - [语义化版本规范](https://semver.org/lang/zh-CN/)
 - [约定式提交规范](https://www.conventionalcommits.org/zh-hans/)
 - [OpenAI API 文档](https://platform.openai.com/docs/)
+- [有道云翻译API文档](https://ai.youdao.com/DOCSIRMA/html/trans/api/wbfy/index.html)
 
 ## 📄 许可证
 
