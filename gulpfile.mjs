@@ -10,10 +10,16 @@ function js_build() {
         .pipe(gulp.dest("dist"));
 }
 
+// 复制 src/template 目录到 dist 目录
+function copyTemplate() {
+    return gulp.src("src/template/**/.vscode/**/*.*")
+        .pipe(gulp.dest("dist/template"));
+}
+
 // 删除 dist 目录
 async function clean() {
     return deleteAsync(['dist/**', '!dist']);
 }
 
 // 多任务合并执行
-gulp.task("default", gulp.series(clean, js_build));
+gulp.task("default", gulp.series(clean, js_build, copyTemplate));
