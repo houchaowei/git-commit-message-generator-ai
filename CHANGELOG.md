@@ -2,6 +2,34 @@
 
 本文件记录项目的所有重要更新。格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)。
 
+### [1.9.4](https://github.com/houchaowei/git-commit-message-generator-ai/compare/v1.6.0...v1.9.4) (2025-07-11)
+
+
+### 新功能
+
+* **feat-250628:** 更新 README 文档内容和结构 ([fe43fa3](https://github.com/houchaowei/git-commit-message-generator-ai/commit/fe43fa3cb458988b03f1aca35259cc4b0861e04b))
+* **Flow-250711:** 新增 GVC 自动化配置生成工具 ([159ba0a](https://github.com/houchaowei/git-commit-message-generator-ai/commit/159ba0a2711e9250f27ec208b3992dd3d33cf6cd))
+
+
+### Bug 修复
+
+* **feat-250628:** 修复工具配置与模型环境变量适配问题 ([d91ee22](https://github.com/houchaowei/git-commit-message-generator-ai/commit/d91ee22eeadb3375a72ac232260703663c999f6e))
+* **flow-250628:** 修复命令使用和可执行文件配置问题 ([450d5c8](https://github.com/houchaowei/git-commit-message-generator-ai/commit/450d5c81a0dd601393aac31d9ddf20a253c435ed))
+* **Flow-250707:** 修复翻译功能缺失问题 ([402bdc7](https://github.com/houchaowei/git-commit-message-generator-ai/commit/402bdc7ae18daff349c78ca9c8ef4104e2cdc9b3))
+* **Flow-250711:** 修复构建流程中模板文件未复制的问题 ([12cdc91](https://github.com/houchaowei/git-commit-message-generator-ai/commit/12cdc91fda0a661866defb5e9d58894746916365))
+
+
+### 其他
+
+* **release:** 1.6.1 [skip ci] ([d829d2f](https://github.com/houchaowei/git-commit-message-generator-ai/commit/d829d2fdf527adfd418db0e9fe1e1c88ce43dcec))
+* **release:** 1.6.2 [skip ci] ([390329c](https://github.com/houchaowei/git-commit-message-generator-ai/commit/390329c65f23fde71396fa56c34a99f950954011))
+* **release:** 1.7.0 [skip ci] ([5858623](https://github.com/houchaowei/git-commit-message-generator-ai/commit/5858623b53e70dbafa16c24058d788982f9c334c))
+* **release:** 1.8.0 [skip ci] ([cf9b59a](https://github.com/houchaowei/git-commit-message-generator-ai/commit/cf9b59a0ee7add02c6cd64f5da5f889e525abf2f))
+* **release:** 1.9.0 [skip ci] ([64a296a](https://github.com/houchaowei/git-commit-message-generator-ai/commit/64a296aea9064bf3983486d78ecd1718a8d980f4))
+* **release:** 1.9.1 [skip ci] ([d75e585](https://github.com/houchaowei/git-commit-message-generator-ai/commit/d75e5850eb179dafb067d00543e6b7307dc4f2a5))
+* **release:** 1.9.2 [skip ci] ([be4c5cb](https://github.com/houchaowei/git-commit-message-generator-ai/commit/be4c5cbab141800ace03c3461bae0dcd50b6fa69))
+* **release:** 1.9.3 [skip ci] ([e74e505](https://github.com/houchaowei/git-commit-message-generator-ai/commit/e74e5059a3467d11def87ab5d9caee6c2613a72f))
+
 ### [1.9.3](https://github.com/houchaowei/git-commit-message-generator-ai/compare/v1.6.0...v1.9.3) (2025-07-11)
 
 
