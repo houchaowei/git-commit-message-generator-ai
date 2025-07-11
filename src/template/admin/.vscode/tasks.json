@@ -1,0 +1,32 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "shell",
+      "command": "{{npmPath}} run dev",
+      "label": "dev",
+      "detail": "启动",
+      "options": {
+        "env": {
+          "PATH": "{{nodeBinDir}}:${env:PATH}"
+        }
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": [
+          {
+            "regexp": ".",
+            "file": 1,
+            "location": 2,
+            "message": 3
+          }
+        ],
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "启动",
+          "endsPattern": "egg-ready"
+        }
+      }
+    },
+  ]
+}

@@ -1,0 +1,45 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "us - Chrome 开发环境",
+            "url": "http://localhost:{{PORT}}/us",
+            // "file": "${file}",
+            "webRoot": "${workspaceFolder}/client/spa",
+            "sourceMaps": true,
+            "preLaunchTask": "us - dev:client"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "NaN - us - Chrome 开发环境",
+            "url": "http://localhost:{{PORT}}/main/home?language=en-US&tenant=LKSG",
+            // "file": "${file}",
+            "webRoot": "${workspaceFolder}/client/spa",
+            "sourceMaps": true,
+            "preLaunchTask": "NaN - us - dev:client"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "自定义端口 - us - Chrome 开发环境",
+            "url": "${input:customUrl}",
+            "webRoot": "${workspaceFolder}/client/spa",
+            "sourceMaps": true,
+            "preLaunchTask": "us - dev:client"
+        },
+    ],
+    "inputs": [
+        {
+            "id": "customUrl",
+            "type": "promptString",
+            "description": "请输入完整URL (例如: http://localhost:8080/us)",
+            "default": "http://localhost:{{PORT}}/us"
+        }
+    ]
+}

@@ -1,0 +1,93 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "dev:server",
+      "type": "shell",
+      "command": "{{npmPath}} run dev:server",
+      "isBackground": true,
+      "options": {
+        "env": {
+          "PATH": "{{nodeBinDir}}:${env:PATH}"
+        }
+      },
+      "problemMatcher": {
+        "pattern": [
+          {
+            "regexp": ".",
+            "file": 1,
+            "location": 2,
+            "message": 3
+          }
+        ],
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Starting",
+          "endsPattern": "egg-ready"
+        }
+      }
+    },
+    {
+      "label": "us - dev:client",
+      "type": "shell",
+      "command": "TENANT=us {{npmPath}} run dev:client --port=${input:portNumber}",
+      "options": {
+        "env": {
+          "PATH": "{{nodeBinDir}}:${env:PATH}"
+        }
+      },
+      "isBackground": true,
+      "dependsOn": ["dev:server"],
+      "problemMatcher": {
+        "pattern": [
+          {
+            "regexp": ".",
+            "file": 1,
+            "location": 2,
+            "message": 3
+          }
+        ],
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Starting",
+          "endsPattern": "Compiled successfully"
+        }
+      }
+    },
+    {
+      "label": "NaN - us - dev:client",
+      "type": "shell",
+      "command": "TENANT=us {{npmPath}} run dev:client --port=${input:portNumber}",
+      "options": {
+        "env": {
+          "PATH": "{{nodeBinDir}}:${env:PATH}"
+        }
+      },
+      "isBackground": true,
+      "dependsOn": ["dev:server"],
+      "problemMatcher": {
+        "pattern": [
+          {
+            "regexp": ".",
+            "file": 1,
+            "location": 2,
+            "message": 3
+          }
+        ],
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Starting",
+          "endsPattern": "Compiled successfully"
+        }
+      }
+    },
+  ],
+  "inputs": [
+    {
+      "id": "portNumber",
+      "type": "promptString",
+      "description": "请输入要使用的端口号",
+      "default": "9002"
+    }
+  ]
+}
